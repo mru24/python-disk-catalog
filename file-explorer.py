@@ -90,6 +90,7 @@ def update(data):
 root = tk.Tk()
 root.geometry("700x500")
 root.title("File Explorer")
+root.iconbitmap("icon.ico")
 
 bf = TkFont.Font(family='Helvetica', size=12, weight='bold')
 lf = TkFont.Font(family='Helvetica', size=13, weight='normal')
