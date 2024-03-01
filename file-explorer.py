@@ -2,16 +2,22 @@ import tkinter as tk
 from tkinter import filedialog, Entry, Menu, Toplevel
 import tkinter.font as TkFont
 import os
+from os import path
+
+config_dir = path.expandvars(r'%LOCALAPPDATA%')
 
 data = ''
 config = []
 folder_selected = ''
 
 def read_config():
-    config = open('config.cfg','r')
+    config = open(config_dir+'config.cfg','r')
     path = config.readline().strip()    
     config.close()
-    return path
+    if path == '':
+        return False
+    else:
+        return path
 
 def about():
     settingsWindow = Toplevel(root)
@@ -23,7 +29,7 @@ def save_config():
     global folder_selected
     folder_selected = filedialog.askdirectory()
     if folder_selected:
-        file = open('config.cfg','w')
+        file = open(config_dir+'config.cfg','w')
         file.write(folder_selected + '\n')
         file.close()
 
