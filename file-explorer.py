@@ -35,26 +35,32 @@ def save_config():
 
 def browse_folder():
     path = filedialog.askdirectory()
-    if path:
+    if path:        
+        info_label.config(text='Working...')
         folder_contents.delete(0, tk.END)
         for root, dirs, files in os.walk(path,onerror=None):           
             for name in files:
                 folder_contents.insert(tk.END, os.path.join(root, name))
+            info_label.config(text='Ready')
         global data
         data = folder_contents.get(0,tk.END)
 
 def save_data():
+    info_label.config(text='Working...')
+    list = folder_contents.get(0, tk.END)
     files = [('Text Document', '*.txt'),('All Files', '*.*')]
     path = read_config()    
     if path:
-        file_path = filedialog.asksaveasfile(initialdir=path,filetypes=files,defaultextension=files)
+        file_path = filedialog.asksaveasfilename(initialdir=path,filetypes=files,defaultextension=files)
     else:
         print("no config")
-        file_path = filedialog.asksaveasfile(filetypes=files,defaultextension=files)
-    if file_path:    
-        file_path.write("\n".join(folder_contents.get(0, tk.END)))
-        file_path.write('\n')
-        file_path.close()
+        file_path = filedialog.asksaveasfilename(filetypes=files,defaultextension=files)
+    if file_path:
+        with open(file_path, "w", encoding="utf-8") as file:
+            for line in list:
+                file.write(line+'\n')
+            file.close()
+            info_label.config(text='Data saved')
 
 def open_data():
     path = read_config()
@@ -62,14 +68,17 @@ def open_data():
         file_path = filedialog.askopenfilename(initialdir=path)
     else:
         file_path = filedialog.askopenfilename()
-    if file_path:
+    if file_path:        
+        info_label.config(text='Working')
         folder_contents.delete(0, tk.END)        
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.read().split("\n")
             for line in lines:
                 folder_contents.insert(tk.END, line)
+            file.close()
+            info_label.config(text='File opened')
         global data
-        data = folder_contents.get(0,tk.END)
+        data = folder_contents.get(0,tk.END)   
 
 def search_string(event):
     typed = search.get()
@@ -90,7 +99,6 @@ def update(data):
 root = tk.Tk()
 root.geometry("700x500")
 root.title("File Explorer")
-root.iconbitmap("icon.ico")
 
 bf = TkFont.Font(family='Helvetica', size=12, weight='bold')
 lf = TkFont.Font(family='Helvetica', size=13, weight='normal')
@@ -115,6 +123,9 @@ browse_button.pack(side=tk.LEFT, pady=5)
 
 save_button = tk.Button(buttons, text="Save", command=save_data, padx=20,pady=5,font=bf)
 save_button.pack(side=tk.LEFT, pady=5)
+
+info_label = tk.Label(buttons,padx=20,font=bf)
+info_label.pack(side=tk.LEFT)
 
 open_button = tk.Button(buttons, text="Open", command=open_data, padx=20,pady=5,font=bf)
 open_button.pack(side=tk.RIGHT, pady=5)
